@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strictPropertyInitialization": false,
+    "strictBindCallApply": false
+  },
+  "extends": "assemblyscript/std/assembly.json",
+  "include": [
+    "./**/*.ts"
+  ]
+}
