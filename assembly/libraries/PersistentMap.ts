@@ -10,7 +10,7 @@ import {
   boolToByte,
   Args,
 } from '@massalabs/as-types';
-import { Storage } from '@massalabs/massa-as-sdk';
+import { Address, Context, Storage } from '@massalabs/massa-as-sdk';
 import { Serializable } from '@massalabs/as-types';
 import { u256 } from 'as-bignum/assembly/integer/u256';
 
@@ -89,10 +89,11 @@ export class PersistentMap<K, V> {
    * ```
    *
    * @param key - Key to check.
+   * @param address - Address containing the PersistentMap.
    * @returns True if the given key present in the map.
    */
-  contains(key: K): bool {
-    return Storage.has(this._key(key));
+  contains(key: K, address: Address = Context.callee()): bool {
+    return Storage.hasOf(address, this._key(key));
   }
 
   /**
@@ -165,35 +166,35 @@ export class PersistentMap<K, V> {
    * @param defaultValue - The default value if the key is not present.
    * @returns Value for the given key or the default value.
    */
-  get(key: K, defaultValue: V): V {
-    if (!this.contains(key)) {
+  get(key: K, defaultValue: V, address: Address = Context.callee()): V {
+    if (!this.contains(key, address)) {
       return defaultValue;
     }
     if (isString<V>()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return bytesToString(Storage.get(this._key(key)));
+      return bytesToString(Storage.getOf(address, this._key(key)));
     } else if (isBoolean<V>()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return byteToBool(Storage.get(this._key(key)));
+      return byteToBool(Storage.getOf(address, this._key(key)));
     } else if (isInteger<V>()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return bytesToU64(Storage.get(this._key(key)));
+      return bytesToU64(Storage.getOf(address, this._key(key)));
     } else if (isFloat<V>()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return bytesToF64(Storage.get(this._key(key)));
+      return bytesToF64(Storage.getOf(address, this._key(key)));
     } else if (idof<V>() == idof<StaticArray<u8>>()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return Storage.get(this._key(key));
+      return Storage.getOf(address, this._key(key));
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
     } else if (defaultValue instanceof Serializable) {
       return (
-        new Args(Storage.get(this._key(key)))
+        new Args(Storage.getOf(address, this._key(key)))
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           .nextSerializable<V>()
@@ -202,12 +203,37 @@ export class PersistentMap<K, V> {
     } else if (defaultValue instanceof u256) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return new Args(Storage.get(this._key(key))).nextU256().unwrap();
+      return new Args(Storage.getOf(address, this._key(key)))
+        .nextU256()
+        .unwrap();
     } else {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       return null;
     }
+  }
+
+  /**
+   * Retrieves the related value for a given key for a given smart contract, or uses the `defaultValue` if not key is found
+   *
+   * ```ts
+   * let map = new PersistentMap<string, string>("m")
+   *
+   * map.set("hello", "world")
+   * let found = map.get("hello")
+   * let notFound = map.get("goodbye", "cruel world")
+   *
+   * assert(found == "world")
+   * assert(notFound == "cruel world")
+   * ```
+   *
+   * @param address - Address containing the PersistentMap.
+   * @param key - Key of the element.
+   * @param defaultValue - The default value if the key is not present.
+   * @returns Value for the given key or the default value.
+   */
+  getOf(address: Address, key: K, defaultValue: V): V {
+    return this.get(key, defaultValue, address);
   }
 
   /**

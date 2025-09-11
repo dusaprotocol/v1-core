@@ -7,7 +7,13 @@ import {
   Result,
 } from '@massalabs/as-types';
 import { Address, call, Storage } from '@massalabs/massa-as-sdk';
-import { FEES_PARAMETERS, TOKEN_X, TOKEN_Y, FACTORY } from '../storage/Pair';
+import {
+  FEES_PARAMETERS,
+  TOKEN_X,
+  TOKEN_Y,
+  FACTORY,
+  SPENDER_APPROVALS,
+} from '../storage/Pair';
 import {
   Bin,
   FeeParameters,
@@ -18,6 +24,11 @@ import {
 import { IERC20 } from './IERC20';
 import { Amounts, MintReturn, OracleSampleReturn } from '../structs/Returns';
 import { u256 } from 'as-bignum/assembly/integer/u256';
+import {
+  createKey,
+  STORAGE_BYTE_COST,
+  STORAGE_PREFIX_LENGTH,
+} from '../libraries';
 
 export class IPair {
   _origin: Address;
@@ -219,7 +230,7 @@ export class IPair {
 
   setFeesParameters(fp: FeeParameters): void {
     const args = new Args().add(fp);
-    call(this._origin, 'setFeesParameter', args, 0);
+    call(this._origin, 'setFeesParameters', args, 0);
   }
 
   forceDecay(): void {
@@ -272,9 +283,13 @@ export class IPair {
    * Grants or revokes permission to `spender` to transfer the caller's tokens, according to `approved`
    * @param _spender The address of the spender
    * @param _approved The boolean value to grant or revoke permission
-   * @param masToSend The amount of Massa to send for storage
    */
-  setApprovalForAll(_approved: bool, _sender: Address, masToSend: u64): void {
+  setApprovalForAll(_approved: bool, _sender: Address): void {
+    const masToSend = computeApprovalStorageCost(
+      _sender,
+      this._origin,
+      this._origin,
+    );
     call(
       this._origin,
       'setApprovalForAll',
@@ -375,4 +390,18 @@ export class IPair {
       masToSend,
     );
   }
+}
+
+function computeApprovalStorageCost(
+  _owner: Address,
+  _spender: Address,
+  _pair: Address,
+): u64 {
+  const key = createKey([_owner.toString(), _spender.toString()]);
+  if (SPENDER_APPROVALS.contains(key, _pair)) {
+    return 0;
+  }
+  const baseLength = STORAGE_PREFIX_LENGTH;
+  const valueLength = 4 * sizeof<u64>();
+  return (baseLength + key.length + valueLength) * STORAGE_BYTE_COST;
 }

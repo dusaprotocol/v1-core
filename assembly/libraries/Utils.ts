@@ -160,3 +160,7 @@ function _transferRemaining(to: Address, value: u64): void {
   if (isAddressEoa(to.toString())) transferCoins(to, value);
   else call(to, 'receiveCoins', new Args(), value);
 }
+
+export const STORAGE_BYTE_COST = 100_000;
+export const STORAGE_PREFIX_LENGTH = 4;
+export const BALANCE_KEY_PREFIX_LENGTH = 7;
