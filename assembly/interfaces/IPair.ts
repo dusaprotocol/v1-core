@@ -13,6 +13,7 @@ import {
   TOKEN_Y,
   FACTORY,
   SPENDER_APPROVALS,
+  HOOKS_PARAMETERS,
 } from '../storage/Pair';
 import {
   Bin,
@@ -29,6 +30,7 @@ import {
   STORAGE_BYTE_COST,
   STORAGE_PREFIX_LENGTH,
 } from '../libraries';
+import { HooksParameters } from '../libraries/Hooks';
 
 export class IPair {
   _origin: Address;
@@ -377,6 +379,15 @@ export class IPair {
   }
 
   /**
+   * @notice Gets the hooks parameters of the Liquidity Book Pair
+   * @return The hooks parameters of the Liquidity Book Pair
+   */
+  getHooksParameters(): HooksParameters {
+    const bs = Storage.getOf(this._origin, HOOKS_PARAMETERS);
+    return new Args(bs).nextSerializable<HooksParameters>().unwrap();
+  }
+
+  /**
    * Increases the length of the oracle to the given `_newLength` by adding empty samples to the end of the oracle.
    * The samples are however initialized to reduce the gas cost of the updates during a swap.
    * @param _newLength The new length of the oracle
@@ -388,6 +399,18 @@ export class IPair {
       'increaseOracleLength',
       new Args().add(newSize),
       masToSend,
+    );
+  }
+
+  setHooksParameters(
+    hooksParameters: HooksParameters,
+    onHooksSetData: StaticArray<u8>,
+  ): void {
+    call(
+      this._origin,
+      'setHooksParameters',
+      new Args().add(hooksParameters).add(onHooksSetData),
+      0,
     );
   }
 }

@@ -28,11 +28,20 @@ export class IRouter {
    *
    * @param {Address} wmas - The address of WMAS
    * @param {Address} factory - The address of the factory
+   * @param {Address} v0factory - The address of the V0 factory
+   * @param {Address} legacyfactory - The address of the legagcy factory
    */
-  init(wmas: Address, factory: Address): void {
-    const args = new Args();
-    args.add(wmas);
-    args.add(factory);
+  init(
+    wmas: Address,
+    factory: Address,
+    v0factory: Address,
+    legacyfactory: Address,
+  ): void {
+    const args = new Args()
+      .add(wmas)
+      .add(factory)
+      .add(v0factory)
+      .add(legacyfactory);
     call(this._origin, 'constructor', args, 0);
   }
 
@@ -120,7 +129,7 @@ export class IRouter {
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
    * @param {u64} masToSend - The amount of MAS to send for storage
-   * @return {Array<u256>} - The amount of tokens received
+   * @return {Amounts} - The amount of tokens received
    */
   removeLiquidity(
     tokenX: Address,
@@ -163,6 +172,7 @@ export class IRouter {
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
    * @param {u64} masToSend - The amount of MAS to send for storage
+   * @return {Amounts} - The amount of tokens received
    */
   removeLiquidityMAS(
     token: Address,
@@ -196,6 +206,7 @@ export class IRouter {
    * @param {u256} amountIn - The amount of tokens to send
    * @param {u256} amountOutMin - The min amount of tokens to receive
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -206,6 +217,7 @@ export class IRouter {
     amountIn: u256,
     amountOutMin: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -215,6 +227,7 @@ export class IRouter {
       .add(amountIn)
       .add(amountOutMin)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline);
@@ -228,6 +241,7 @@ export class IRouter {
    * @param {u256} amountIn - The amount of tokens to send
    * @param {u256} amountOutMinMAS - The min amount of MAS to receive
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -238,6 +252,7 @@ export class IRouter {
     amountIn: u256,
     amountOutMinMAS: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -247,6 +262,7 @@ export class IRouter {
       .add(amountIn)
       .add(amountOutMinMAS)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline);
@@ -260,6 +276,7 @@ export class IRouter {
    * @param {u256} amountIn - The amount of MAS to send for swap and storage
    * @param {u256} amountOutMin - The min amount of token to receive
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -270,6 +287,7 @@ export class IRouter {
     amountIn: u256,
     amountOutMin: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -278,6 +296,7 @@ export class IRouter {
     const args = new Args()
       .add(amountOutMin)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline)
@@ -297,6 +316,7 @@ export class IRouter {
    * @param {u256} amountOut - The amount of token to receive
    * @param {u256} amountInMax - The max amount of token to send
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -307,6 +327,7 @@ export class IRouter {
     amountOut: u256,
     amountInMax: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -316,6 +337,7 @@ export class IRouter {
       .add(amountOut)
       .add(amountInMax)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline);
@@ -329,6 +351,7 @@ export class IRouter {
    * @param {u256} amountOut - The amount of MAS to receive
    * @param {u256} amountInMax - The max amount of token to send
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -339,6 +362,7 @@ export class IRouter {
     amountOut: u256,
     amountInMax: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -348,6 +372,7 @@ export class IRouter {
       .add(amountOut)
       .add(amountInMax)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline);
@@ -361,6 +386,7 @@ export class IRouter {
    * @param {u256} amountOut - The amount of token to receive
    * @param {u256} amountInMax - The max amount of Mas to send
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -371,6 +397,7 @@ export class IRouter {
     amountOut: u256,
     amountInMax: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -379,6 +406,7 @@ export class IRouter {
     const args = new Args()
       .add(amountOut)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline)
@@ -398,6 +426,7 @@ export class IRouter {
    * @param {u256} amountIn - The amount of token to send
    * @param {u256} amountOutMin - The min amount of token to receive
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -408,6 +437,7 @@ export class IRouter {
     amountIn: u256,
     amountOutMin: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -417,6 +447,7 @@ export class IRouter {
       .add(amountIn)
       .add(amountOutMin)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline);
@@ -435,6 +466,7 @@ export class IRouter {
    * @param {u256} amountIn - The amount of token to send
    * @param {u256} amountOutMinMAS - The min amount of MAS to receive
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -445,6 +477,7 @@ export class IRouter {
     amountIn: u256,
     amountOutMinMAS: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -454,6 +487,7 @@ export class IRouter {
       .add(amountIn)
       .add(amountOutMinMAS)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline);
@@ -472,6 +506,7 @@ export class IRouter {
    * @param {u256} amountIn - The amount of MAS to send for swap and storage
    * @param {u256} amountOutMin - The min amount of token to receive
    * @param {Array<u64>} pairBinSteps - The bin step of the pairs
+   * @param {Array<bool>} isLegacyPools - If the pairs are legacy pairs
    * @param {IERC20[]} tokenPath - The swap path using the binSteps following `_pairBinSteps`
    * @param {Address} to - The address of the recipient
    * @param {u64} deadline - The deadline of the tx
@@ -482,6 +517,7 @@ export class IRouter {
     amountIn: u256,
     amountOutMin: u256,
     pairBinSteps: Array<u64>,
+    isLegacyPools: Array<bool>,
     tokenPath: IERC20[],
     to: Address,
     deadline: u64,
@@ -490,6 +526,7 @@ export class IRouter {
     const args = new Args()
       .add(amountOutMin)
       .add(pairBinSteps)
+      .add(isLegacyPools)
       .addSerializableObjectArray(tokenPath)
       .add(to)
       .add(deadline)

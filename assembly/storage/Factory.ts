@@ -4,6 +4,7 @@ import { Preset, LBPairInformation } from '../structs';
 
 export const FEE_RECIPIENT = 'FEE_RECIPIENT';
 export const FLASH_LOAN_FEE = stringToBytes('FLASH_LOAN_FEE');
+export const HOOKS_MANAGER = 'HOOKS_MANAGER';
 
 export const QUOTE_ASSETS = 'QUOTE_ASSETS';
 

@@ -1,5 +1,6 @@
 import { u256 } from 'as-bignum/assembly/integer/u256';
 import { FeesDistribution } from './FeesDistribution';
+import { ZERO } from '../libraries/Constants';
 
 // GENERAL
 
@@ -74,8 +75,8 @@ export class OracleSampleReturn {
  */
 export class GetSwapInReturn {
   constructor(
-    public amountIn: u256 = u256.Zero,
-    public feesIn: u256 = u256.Zero,
+    public amountIn: u256 = ZERO,
+    public feesIn: u256 = ZERO,
   ) {}
 }
 
@@ -85,8 +86,8 @@ export class GetSwapInReturn {
  */
 export class GetSwapOutReturn {
   constructor(
-    public amountOut: u256 = u256.Zero,
-    public feesIn: u256 = u256.Zero,
+    public amountOut: u256 = ZERO,
+    public feesIn: u256 = ZERO,
   ) {}
 }
 

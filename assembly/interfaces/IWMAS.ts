@@ -1,20 +1,24 @@
-import { balanceKey } from '@massalabs/sc-standards/assembly/contracts/FT/token-internals';
+import { balanceKey } from '@massalabs/sc-standards/assembly/contracts/MRC20/MRC20-internals';
 import { Args } from '@massalabs/as-types';
 import { Address, call, Storage } from '@massalabs/massa-as-sdk';
-import { TokenWrapper } from '@massalabs/sc-standards/assembly/contracts/FT';
+import { MRC20Wrapper } from '@massalabs/sc-standards/assembly/contracts/MRC20/wrapper';
 import { u256 } from 'as-bignum/assembly/integer/u256';
+import {
+  STORAGE_PREFIX_LENGTH,
+  BALANCE_KEY_PREFIX_LENGTH,
+  STORAGE_BYTE_COST,
+  ZERO,
+} from '../libraries';
 
-const STORAGE_BYTE_COST = 100_000;
-const STORAGE_PREFIX_LENGTH = 4;
-const BALANCE_KEY_PREFIX_LENGTH = 7;
-export class IWMAS extends TokenWrapper {
+export class IWMAS extends MRC20Wrapper {
   init(
     name: string = 'Wrapped Massa',
     symbol: string = 'WMAS',
     decimals: u8 = 9,
-    supply: u256 = u256.Zero,
+    supply: u256 = ZERO,
+    coins: u64 = 0,
   ): void {
-    super.init(name, symbol, decimals, supply);
+    super.init(name, symbol, decimals, supply, coins);
   }
 
   deposit(value: u64): void {
@@ -36,6 +40,11 @@ export class IWMAS extends TokenWrapper {
   }
 
   transferWithFee(toAccount: Address, nbTokens: u256, fee: u64 = 0): void {
-    call(this._origin, 'transfer', new Args().add(toAccount).add(nbTokens), fee);
+    call(
+      this._origin,
+      'transfer',
+      new Args().add(toAccount).add(nbTokens),
+      fee,
+    );
   }
 }

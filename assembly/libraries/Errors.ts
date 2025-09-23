@@ -1,6 +1,7 @@
 import { Address } from '@massalabs/massa-as-sdk';
 import { u256 } from 'as-bignum/assembly/integer/u256';
 import { u256ToString } from './Utils';
+import { HooksParameters } from './Hooks';
 
 /** LBRouter errors */
 
@@ -12,6 +13,7 @@ export const LBRouter__BrokenSwapSafetyCheck = (): string =>
   'LBRouter__BrokenSwapSafetyCheck';
 export const LBRouter__NotFactoryOwner = (): string =>
   'LBRouter__NotFactoryOwner';
+export const LBRouter__TooManyBins = (): string => 'LBRouter__TooManyBins';
 export const LBRouter__TooMuchTokensIn = (excess: u256): string =>
   `LBRouter__TooMuchTokensIn: ${u256ToString(excess)}`;
 export const LBRouter__IdOverflows = (id: i64): string =>
@@ -152,6 +154,15 @@ export const LBFactory__SameFeeRecipient = (feeRecipient: Address): string =>
   `LBFactory__SameFeeRecipient: ${feeRecipient}`;
 export const LBFactory__SameFlashLoanFee = (flashLoanFee: u64): string =>
   `LBFactory__SameFlashLoanFee: ${flashLoanFee}`;
+export const LBFactory__LBPairNotCreated = (
+  tokenX: Address,
+  tokenY: Address,
+  binStep: u64,
+): string => `LBFactory__LBPairNotCreated: ${tokenX}, ${tokenY}, ${binStep}`;
+export const LBFactory__SameHooksParameters = (
+  hooksParameters: HooksParameters,
+): string =>
+  `LBFactory__SameHooksParameters: ${hooksParameters.hooks}, ${hooksParameters.flags}`;
 
 /** LBPair errors */
 
@@ -190,7 +201,7 @@ export const LBPair__BinStepNotSame = (): string => 'LBPair__BinStepNotSame';
 
 /** BinHelper errors */
 
-export const BinHelper__BinStepOverflows = (bp: u64): string =>
+export const BinHelper__BinStepOverflows = (bp: u16): string =>
   `BinHelper__BinStepOverflows: ${bp}`;
 export const BinHelper__IdOverflows = (): string => 'BinHelper__IdOverflows';
 

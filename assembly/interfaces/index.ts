@@ -5,3 +5,6 @@ export * from './IPair';
 export * from './IQuoter';
 export * from './IRouter';
 export * from './IWMAS';
+export * from './IV0Factory';
+export * from './IV0Pair';
+export * from './IHooks';

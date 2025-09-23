@@ -7,16 +7,17 @@ import {
   stringToBytes,
 } from '@massalabs/as-types';
 import { Address, Context, Storage, call } from '@massalabs/massa-as-sdk';
-import { TokenWrapper } from '@massalabs/sc-standards/assembly/contracts/FT';
-import { BALANCE_KEY_PREFIX } from '@massalabs/sc-standards/assembly/contracts/FT/token-internals';
+import { MRC20Wrapper } from '@massalabs/sc-standards/assembly/contracts/MRC20/wrapper';
+import { BALANCE_KEY_PREFIX } from '@massalabs/sc-standards/assembly/contracts/MRC20/MRC20-internals';
 import { u256 } from 'as-bignum/assembly/integer/u256';
 import { SafeMath256 } from '../libraries/SafeMath';
+import {
+  STORAGE_PREFIX_LENGTH,
+  BALANCE_KEY_PREFIX_LENGTH,
+  STORAGE_BYTE_COST,
+} from '../libraries';
 
-const STORAGE_BYTE_COST = 100_000;
-const STORAGE_PREFIX_LENGTH = 4;
-const BALANCE_KEY_PREFIX_LENGTH = 7;
-
-export class IERC20 extends TokenWrapper implements Serializable {
+export class IERC20 extends MRC20Wrapper implements Serializable {
   constructor(origin: Address = new Address()) {
     super(origin);
   }
@@ -45,12 +46,12 @@ export class IERC20 extends TokenWrapper implements Serializable {
   }
 
   // Overide wrapper with storage cost
-  transfer(toAccount: Address, nbTokens: u256): void {
+  transfer(toAccount: Address, nbTokens: u256, coins: u64 = 0): void {
     call(
       this._origin,
       'transfer',
       new Args().add(toAccount).add(nbTokens),
-      computeTransferStorageCost(toAccount, this._origin),
+      coins || computeTransferStorageCost(toAccount, this._origin),
     );
   }
 
@@ -59,12 +60,13 @@ export class IERC20 extends TokenWrapper implements Serializable {
     ownerAccount: Address,
     recipientAccount: Address,
     nbTokens: u256,
+    coins: u64 = 0,
   ): void {
     call(
       this._origin,
       'transferFrom',
       new Args().add(ownerAccount).add(recipientAccount).add(nbTokens),
-      computeTransferStorageCost(recipientAccount, this._origin),
+      coins || computeTransferStorageCost(recipientAccount, this._origin),
     );
   }
 

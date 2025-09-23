@@ -16,6 +16,8 @@ export const PAIR_INFORMATION = stringToBytes('PAIR_INFORMATION');
 export const FEES_PARAMETERS = stringToBytes('FEES_PARAMETERS');
 /// @dev Reentrancy Guard status
 export const STATUS = stringToBytes('status');
+/// @dev HooksParameters
+export const HOOKS_PARAMETERS = stringToBytes('hooksParams');
 
 /// @dev PersistentMap from id to Bin.
 /// This is the amount of tokenY if `id < _pairInformation.activeId`;
